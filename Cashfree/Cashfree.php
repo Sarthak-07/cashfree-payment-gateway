@@ -32,6 +32,12 @@ class Cashfree extends Gateway
     {
         return [
             [
+                'name' => 'order_id_prefix',
+                'friendlyName' => 'Order ID Prefix',
+                'type' => 'text',
+                'required' => true,
+            ],
+            [
                 'name' => 'cashfree_api_key',
                 'friendlyName' => 'Cashfree APP ID',
                 'type' => 'text',
@@ -75,7 +81,7 @@ class Cashfree extends Gateway
     {
         $apiKey = ExtensionHelper::getConfig('Cashfree', 'test_mode') ? ExtensionHelper::getConfig('Cashfree', 'test_api_key') : ExtensionHelper::getConfig('Cashfree', 'cashfree_api_key');
         $secretKey = ExtensionHelper::getConfig('Cashfree', 'test_mode') ? ExtensionHelper::getConfig('Cashfree', 'test_api_secret') : ExtensionHelper::getConfig('Cashfree', 'cashfree_api_secret');        
-        $orderId = 'order_' . $invoiceId;
+        $orderId = ExtensionHelper::getConfig('Cashfree', 'order_id_prefix') . $invoiceId;
         
         if (ExtensionHelper::getConfig('Cashfree', 'test_mode')) {
             $getUrl = "https://sandbox.cashfree.com/pg/orders/{$orderId}";
@@ -117,7 +123,7 @@ class Cashfree extends Gateway
         }
         
         $order_amount = $total;
-        $orderId = 'order_' . $invoiceId;
+        $orderId = ExtensionHelper::getConfig('Cashfree', 'order_id_prefix') . $invoiceId;
         $order_note = $products[0]->name;
         $customerId = 'customer_' . $invoiceId;
         $customer_name = auth()->user()->name;
@@ -221,7 +227,7 @@ class Cashfree extends Gateway
      */
     private function extractInvoiceId($orderId)
     {
-        $numericPart = str_replace('order_', '', $orderId);
+        $numericPart = str_replace(ExtensionHelper::getConfig('Cashfree', 'order_id_prefix'), '', $orderId);
         return (int)$numericPart;
     }
 }
